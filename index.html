@@ -524,7 +524,7 @@ body{font-family:"Hiragino Kaku Gothic Pro","Meiryo","Yu Gothic",system-ui,sans-
     診断を開始する
   </button>
 
-  <!--div class="intro-sub-note">入力内容はすべてブラウザ内のみで処理されます。サーバーへの送信は一切行いません。</div-->
+  <div class="intro-sub-note">入力内容はすべてブラウザ内のみで処理されます。サーバーへの送信は一切行いません。</div>
 
   <div class="intro-target">
     <div class="intro-target-title">
@@ -563,7 +563,7 @@ body{font-family:"Hiragino Kaku Gothic Pro","Meiryo","Yu Gothic",system-ui,sans-
     </div>
   </div>
 
-  <!--div class="intro-qr-wrap">
+  <div class="intro-qr-wrap">
     <div class="intro-qr-title">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1D9E75" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3M17 20h3M20 17v3"/></svg>
       支援者の方へ：このQRコードをご案内ください
@@ -573,7 +573,7 @@ body{font-family:"Hiragino Kaku Gothic Pro","Meiryo","Yu Gothic",system-ui,sans-
       <div id="qrcode-img"></div>
       <div class="intro-qr-url">https://directfuneral.github.io/dai8legalclinic/</div>
     </div>
-  </div-->
+  </div>
 
 </div>
 
@@ -1012,6 +1012,7 @@ body{font-family:"Hiragino Kaku Gothic Pro","Meiryo","Yu Gothic",system-ui,sans-
 
 <script>
 var _pdfExported=false; /* 「PDF出力有無」記録用フラグ：printDirect()実行時にtrueになる */
+var _lastSavedCaseId=null; /* 直近に「案件として保存」した際、GASから返却された案件ID（相談申込みとの関連付けに使用） */
 var D={mar:'既婚',ch:0,par:'両方故人',si:0,deadSib:0,nephews:0,halfSib:0,gpar:'',deadCh:0,grandCh:0,done:[],worry:[],ar:{},
   sibTypes:{ani:0,otouto:0,ane:0,imouto:0},
   halfSibTypes:{hAni:0,hOtouto:0,hAne:0,hImouto:0},
@@ -3934,10 +3935,10 @@ checkExistingSave();
 
 /* ★設定箇所：Google Apps ScriptのウェブアプリURLをここに設定してください
    （GASエディタで「デプロイ」→「ウェブアプリ」として発行されるURL）  */
-var GAS_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbwUXWMz6NRfjAF_JFbt8EtuZRi3YyOte-Z4fMYNWxhMEC76i77qQoG-6GJ8KOQ8UHf4/exec';
+var GAS_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbyyj_rqnxNiPI90JY2U1YhO8AoKhQItbOE2xZNhPfJwBDGZQWY9KMQKdOPy9vlIsRn6/exec';
 
 function isGasUrlConfigured(){
-  return !!GAS_WEBAPP_URL && GAS_WEBAPP_URL.indexOf('YOUR_GAS_WEBAPP_URL_HERE')===-1;
+  return !!GAS_WEBAPP_URL && GAS_WEBAPP_URL.indexOf('https://script.google.com/macros/s/AKfycbyyj_rqnxNiPI90JY2U1YhO8AoKhQItbOE2xZNhPfJwBDGZQWY9KMQKdOPy9vlIsRn6/exec')===-1;
 }
 
 /* Google Apps Scriptへ送信する共通関数
@@ -3959,20 +3960,6 @@ function postToGAS(payload,onSuccess,onError){
     }).catch(function(err){
       onError('通信エラーが発生しました。ネットワーク接続をご確認ください。');
     });
-}
-
-/* 案件ID生成：例 SZ-20260718-0001（同一ブラウザセッション内で日付ごとに連番） */
-function generateCaseId(){
-  var now=new Date();
-  var y=now.getFullYear();
-  var m=('0'+(now.getMonth()+1)).slice(-2);
-  var d=('0'+now.getDate()).slice(-2);
-  var dateStr=''+y+m+d;
-  var seqKey='_case_seq_'+dateStr;
-  var seq=(parseInt(sessionStorage.getItem(seqKey)||'0',10)||0)+1;
-  try{sessionStorage.setItem(seqKey,String(seq));}catch(e){}
-  var seqStr=('000'+seq).slice(-4);
-  return 'SZ-'+dateStr+'-'+seqStr;
 }
 
 /* ── 推定相続税の簡易計算 ──
@@ -4025,6 +4012,23 @@ function buildFamilySummary(){
   var heirs=getHeirShares();
   parts.push('法定相続人数：'+heirs.length+'人');
   return parts.join('／');
+}
+
+/* 「診断結果」列に保存する読みやすい要約テキストを生成
+   （家族構成・資産負債・推定相続税・処方箋（#alist）の内容をまとめる） */
+function buildDiagnosisResultText(){
+  var lines=[];
+  lines.push(buildFamilySummary());
+  lines.push('資産総額：'+getTotalAssets().toLocaleString()+'円／負債総額：'+getTotalDebt().toLocaleString()+'円／推定相続税：'+estimateInheritanceTax().toLocaleString()+'円');
+  var alistEl=document.getElementById('alist');
+  if(alistEl){
+    var items=Array.prototype.map.call(alistEl.querySelectorAll('li'),function(li){return (li.innerText||li.textContent||'').trim();}).filter(Boolean);
+    if(items.length){
+      lines.push('【処方箋】');
+      items.forEach(function(t,i){lines.push((i+1)+'. '+t);});
+    }
+  }
+  return lines.join('\n');
 }
 
 /* 汎用：ラジオ/チェックボックスのレンダリング（既存の.rb/.cb/.ciスタイルを利用） */
@@ -4085,19 +4089,20 @@ function submitConsult(){
   btn.disabled=true;btn.textContent='送信中…';
   var payload={
     formType:'consultation',
-    caseId:generateCaseId(),
-    registeredAt:new Date().toLocaleString('ja-JP'),
+    appliedAt:new Date().toLocaleString('ja-JP'),
     name:CONSULT.name,
     email:CONSULT.email,
     tel:CONSULT.tel,
     contactMethod:CONSULT.contact,
     topics:CONSULT.topics.join('、'),
-    memo:CONSULT.memo
+    memo:CONSULT.memo,
+    relatedCaseId:_lastSavedCaseId||'',
+    relatedSummary:buildFamilySummary()
   };
-  postToGAS(payload,function(){
+  postToGAS(payload,function(data){
     btn.disabled=false;btn.textContent='送信する';
     status.className='lc-status ok';
-    status.textContent='✅ お申し込みを受け付けました。担当者よりご連絡いたします。';
+    status.textContent='✅ お申し込みを受け付けました（受付番号：'+(data&&data.caseId||'-')+'）。担当者よりご連絡いたします。';
     setTimeout(closeConsultModal,1800);
   },function(msg){
     btn.disabled=false;btn.textContent='送信する';
@@ -4142,8 +4147,7 @@ function submitCaseSave(){
     enFields:collectENFields()
   };
   var payload={
-    formType:'case',
-    caseId:generateCaseId(),
+    formType:'diagnosis',
     registeredAt:new Date().toLocaleString('ja-JP'),
     companyName:_wlOfficeName(),
     staffName:CASE_SAVE.staff,
@@ -4151,7 +4155,8 @@ function submitCaseSave(){
     customerEmail:CASE_SAVE.custEmail,
     customerTel:CASE_SAVE.custTel,
     contactMethod:CASE_SAVE.contact,
-    diagnosisJson:JSON.stringify(diagnosisSnapshot),
+    answersJson:JSON.stringify(diagnosisSnapshot),
+    resultText:buildDiagnosisResultText(),
     totalAssets:getTotalAssets(),
     totalDebt:getTotalDebt(),
     estimatedTax:estimateInheritanceTax(),
@@ -4159,12 +4164,14 @@ function submitCaseSave(){
     consultRequest:CASE_SAVE.memo,
     pdfExported:_pdfExported?'あり':'なし'
   };
-  postToGAS(payload,function(){
+  postToGAS(payload,function(data){
+    var caseId=(data&&data.caseId)||'-';
+    _lastSavedCaseId=caseId;
     btn.disabled=false;btn.textContent='保存する';
     status.className='lc-status ok';
-    status.textContent='✅ 案件として保存しました（案件ID：'+payload.caseId+'）';
+    status.textContent='✅ 案件として保存しました（案件ID：'+caseId+'）';
     var topStatus=document.getElementById('case-save-status');
-    if(topStatus){topStatus.className='case-save-status ok';topStatus.textContent='✅ 保存済（案件ID：'+payload.caseId+'）';}
+    if(topStatus){topStatus.className='case-save-status ok';topStatus.textContent='✅ 保存済（案件ID：'+caseId+'）';}
     setTimeout(closeCaseModal,1800);
   },function(msg){
     btn.disabled=false;btn.textContent='保存する';
