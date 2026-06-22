@@ -3941,9 +3941,9 @@ var GAS_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbyyj_rqnxNiPI90JY2
 /* Google Apps Scriptへ送信する共通関数
    GAS側のCORS制約を避けるため text/plain でJSON文字列を送信する */
 function postToGAS(payload,onSuccess,onError){
-  if(!GAS_WEBAPP_URL || GAS_WEBAPP_URL.indexOf('https://script.google.com/macros/s/AKfycbyyj_rqnxNiPI90JY2U1YhO8AoKhQItbOE2xZNhPfJwBDGZQWY9KMQKdOPy9vlIsRn6/exec')!==-1){
-    onError('システム設定が完了していません。管理者へお問い合わせください。');
-    return;
+   if(!GAS_WEBAPP_URL){
+      onError('システム設定が完了していません。管理者へお問い合わせください。');
+      return;
   }
   fetch(GAS_WEBAPP_URL,{
     method:'POST',
