@@ -3935,29 +3935,17 @@ checkExistingSave();
 
 /* ★設定箇所：Google Apps ScriptのウェブアプリURLをここに設定してください
    （GASエディタで「デプロイ」→「ウェブアプリ」として発行されるURL）  */
-var GAS_WEBAPP_URL = 'YOUR_GAS_WEBAPP_URL_HERE';
-
-/* GAS送信先URLを返す（管理パネルで設定したsessionStorage値を優先し、未設定なら定数を使う） */
-function getGasUrl(){
-  try{
-    var stored=localStorage.getItem('wl_gas_url');
-    if(stored&&stored.trim())return stored.trim();
-  }catch(e){}
-  return GAS_WEBAPP_URL;
-}
-function isGasUrlConfigured(){
-  var url=getGasUrl();
-  return !!url && url.indexOf('YOUR_GAS_WEBAPP_URL_HERE')===-1;
-}
+/* ★ 管理者設定箇所：GASウェブアプリのURLをここに直接記載してください */
+var GAS_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbyyj_rqnxNiPI90JY2U1YhO8AoKhQItbOE2xZNhPfJwBDGZQWY9KMQKdOPy9vlIsRn6/exec';
 
 /* Google Apps Scriptへ送信する共通関数
    GAS側のCORS制約を避けるため text/plain でJSON文字列を送信する */
 function postToGAS(payload,onSuccess,onError){
-  if(!isGasUrlConfigured()){
-    onError('Google Apps ScriptのURLが設定されていません。フッターを3回クリックして管理パネルを開き「Google Apps Script URL」を入力・保存してください。');
+  if(!GAS_WEBAPP_URL || GAS_WEBAPP_URL.indexOf('https://script.google.com/macros/s/AKfycbyyj_rqnxNiPI90JY2U1YhO8AoKhQItbOE2xZNhPfJwBDGZQWY9KMQKdOPy9vlIsRn6/exec')!==-1){
+    onError('システム設定が完了していません。管理者へお問い合わせください。');
     return;
   }
-  fetch(getGasUrl(),{
+  fetch(GAS_WEBAPP_URL,{
     method:'POST',
     mode:'cors',
     headers:{'Content-Type':'text/plain;charset=utf-8'},
@@ -4361,11 +4349,6 @@ document.addEventListener('keydown',function(e){
       </div>
       <hr class="wl-divider" />
       <div class="wl-field">
-        <label>🔗 Google Apps Script URL（案件保存・相談申込みの送信先）</label>
-        <input type="url" id="wl-gas-url" placeholder="https://script.google.com/macros/s/.../exec" autocomplete="off" style="font-size:.78rem" />
-        <p class="wl-copy-note" style="margin-top:6px">GASのウェブアプリとしてデプロイした際に発行されるURLを貼り付けてください。設定するとブラウザを閉じるまで有効です。</p>
-      </div>
-      <div class="wl-field">
         <button type="button" id="wl-copy-url">🔗 共有用URLをコピー</button>
         <div id="wl-copy-url-hint" class="wl-copy-hint"></div>
         <p class="wl-copy-note">事務所名・電話番号・HP・お問い合わせURLをパラメータに含んだURLをコピーします。このURLを送るだけで相手の画面に設定が反映されます。</p>
@@ -4587,8 +4570,6 @@ document.addEventListener('keydown',function(e){
     document.getElementById('wl-tel').value         =d.tel         ||'';
     document.getElementById('wl-services-desc').value=d.servicesDesc||'';
     document.getElementById('wl-new-pw').value      ='';
-    /* GAS URL（wl_office_dataとは別キーで保存する） */
-    try{document.getElementById('wl-gas-url').value=localStorage.getItem('wl_gas_url')||'';}catch(e){}
   }
 
 
@@ -4602,14 +4583,7 @@ document.addEventListener('keydown',function(e){
     d.contact     =document.getElementById('wl-contact').value.trim();
     d.tel         =document.getElementById('wl-tel').value.trim();
     d.servicesDesc=document.getElementById('wl-services-desc').value.trim();
-    /* GAS URL */
-    var gasUrl=document.getElementById('wl-gas-url').value.trim();
-    try{
-      if(gasUrl){localStorage.setItem('wl_gas_url',gasUrl);}
-      else{localStorage.removeItem('wl_gas_url');}
-    }catch(e){}
-    sessionStorage.setItem(STORAGE_KEY,JSON.stringify(d));
-    var newPw=document.getElementById('wl-new-pw').value.trim();
+    sessionStorage.setItem(STORAGE_KEY,JSON.stringify(d));    var newPw=document.getElementById('wl-new-pw').value.trim();
     if(newPw)sessionStorage.setItem(PW_KEY,newPw);
     showToast('✅ 設定を保存しました。リロードします…');
     setTimeout(function(){location.reload();},900);
@@ -4619,7 +4593,6 @@ document.addEventListener('keydown',function(e){
     if(confirm('設定をすべてリセットしますか？\nパスワードも初期値（admin1234）に戻ります。')){
       sessionStorage.removeItem(STORAGE_KEY);
       sessionStorage.removeItem(PW_KEY);
-      try{localStorage.removeItem('wl_gas_url');}catch(e){}
       showToast('🗑 設定をリセットしました。リロードします…');
       setTimeout(function(){location.reload();},900);
     }
