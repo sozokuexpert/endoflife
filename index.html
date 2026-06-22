@@ -455,7 +455,7 @@ body{font-family:"Hiragino Kaku Gothic Pro","Meiryo","Yu Gothic",system-ui,sans-
   "name": "一般社団法人 相続手続士業の会",
   "alternateName": "終活リーガルクリニック",
   "url": "https://sozoku-expert.net/",
-  "sameAs": "https://directfuneral.github.io/dai8legalclinic/",
+  "sameAs": "https://sozokuexpert.github.io/endoflife/",
   "telephone": "03-6721-6811",
   "address": {
     "@type": "PostalAddress",
@@ -463,7 +463,7 @@ body{font-family:"Hiragino Kaku Gothic Pro","Meiryo","Yu Gothic",system-ui,sans-
     "addressRegion": "東京都",
     "addressLocality": "港区南麻布"
   },
-  "description": "相続手続・終活サポート・遺言書作成を専門とする一般社団法人（東京都港区）。終活に必要な手続きを無料でチェックできるWebツールを提供しています。",
+  "description": "相続手続・終活サポート・遺言書作成を専門とする一般社団法人（東京都港区）。終活・相続に必要な手続きを無料でチェックできるWebツールを提供しています。",
   "areaServed": {
     "@type": "AdministrativeArea",
     "name": "東京都・港区"
@@ -568,10 +568,10 @@ body{font-family:"Hiragino Kaku Gothic Pro","Meiryo","Yu Gothic",system-ui,sans-
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1D9E75" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3M17 20h3M20 17v3"/></svg>
       支援者の方へ：このQRコードをご案内ください
     </div>
-    <div class="intro-qr-desc">入院中の空き時間などに、スマートフォンでQRコードを読み取るだけで入力を開始できます。入力内容はすべてお手元のブラウザ内に保存されます。</div>
+    <div class="intro-qr-desc">入院中の空き時間などに、スマートフォンでQRコードを読み取るだけで入力を開始できます。</div>
     <div class="intro-qr-box">
       <div id="qrcode-img"></div>
-      <div class="intro-qr-url">https://directfuneral.github.io/dai8legalclinic/</div>
+      <div class="intro-qr-url">https://sozokuexpert.github.io/endoflife/</div>
     </div>
   </div>
 
@@ -581,7 +581,8 @@ body{font-family:"Hiragino Kaku Gothic Pro","Meiryo","Yu Gothic",system-ui,sans-
 <div class="save-bar" id="save-bar">
   <div class="save-bar-left">
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9fe1cb" stroke-width="2" stroke-linecap="round"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-    入力内容を一時保存できます<span class="save-time" id="save-time"></span>
+    入力内容は、このブラウザを閉じるまで保存されます。
+    <span class="save-time" id="save-time"></span>
   </div>
   <div class="save-bar-right">
     <button class="load-btn" onclick="loadSave()" id="load-btn" style="display:none">↑ 保存データを復元</button>
@@ -4248,7 +4249,7 @@ document.addEventListener('keydown',function(e){
   }
 
   var img=document.createElement('img');
-  img.src='https://api.qrserver.com/v1/create-qr-code/?size=160x160&color=0F6E56&data='+encodeURIComponent(buildShareUrl());
+  img.src='https://api.qrserver.com/v1/create-qr-code/?size=160x160&color=0F6E56&data='+encodeURIComponent('https://sozokuexpert.github.io/endoflife/');
   img.alt='QRコード';
   img.width=160;img.height=160;
   container.appendChild(img);
@@ -4262,7 +4263,7 @@ document.addEventListener('keydown',function(e){
 <!-- 保存完了トースト -->
 <div id="save-toast">
   ✅ 保存しました
-  <span class="toast-sub">次回もこの続きから始められます</span>
+  <span class="toast-sub">入力内容は、このブラウザを閉じるまで保存されます。</span>
 </div>
 
 <!-- ============================================================
