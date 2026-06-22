@@ -416,12 +416,7 @@ body{font-family:"Hiragino Kaku Gothic Pro","Meiryo","Yu Gothic",system-ui,sans-
 .consult-cta-btn:hover{background:#d48b1a}
 .consult-cta-btn svg{width:19px;height:19px;flex-shrink:0}
 .lead-action-sub{font-size:11.5px;color:var(--text3);text-align:center;margin-top:6px}
-.case-save-btn{width:100%;padding:12px;background:#fff;color:var(--teal2);border:1.5px solid var(--teal);border-radius:var(--r);font-size:14.5px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:10px;transition:background .15s}
-.case-save-btn:hover{background:var(--teal3)}
-.case-save-btn svg{width:17px;height:17px;flex-shrink:0}
-.case-save-status{font-size:12px;text-align:center;margin-top:6px;min-height:1em}
-.case-save-status.ok{color:var(--teal2);font-weight:600}
-.case-save-status.err{color:var(--red)}
+
 
 /* ===== 無料相談申込 / 案件保存 モーダル共通 ===== */
 .lc-overlay{display:none;position:fixed;inset:0;background:rgba(15,20,40,.55);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);z-index:9990;align-items:center;justify-content:center;padding:16px}
@@ -990,12 +985,6 @@ body{font-family:"Hiragino Kaku Gothic Pro","Meiryo","Yu Gothic",system-ui,sans-
   </button>
   <div class="lead-action-sub">専門家による無料相談のお申し込みを承っています</div>
 </div>
-<button class="case-save-btn" onclick="openCaseSaveModal()">
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-  案件として保存する
-</button>
-<div id="case-save-status" class="case-save-status"></div>
-
 <button class="print-btn" onclick="printDirect()">📄 診断書を印刷する</button>
   <div style="font-size:12px;color:#888;text-align:center;margin-top:5px">表紙 → 相続関係図 → 財産目録 → エンディングノート → 契約一覧 → 処方箋の順で印刷されます（ポップアップ許可が必要）</div>
   <div style="font-size:12px;color:#555;text-align:center;margin-top:8px;padding:8px 12px;background:#f0f6ff;border-radius:6px;border:1px solid #c5d9f5">💡 <strong>PDFで保存したい場合：</strong>印刷画面が開いたら、送信先（プリンター）を「<strong>PDFに保存</strong>」に変更してください。</div>
@@ -1013,7 +1002,8 @@ body{font-family:"Hiragino Kaku Gothic Pro","Meiryo","Yu Gothic",system-ui,sans-
 
 <script>
 var _pdfExported=false; /* 「PDF出力有無」記録用フラグ：printDirect()実行時にtrueになる */
-var _lastSavedCaseId=null; /* 直近に「案件として保存」した際、GASから返却された案件ID（相談申込みとの関連付けに使用） */
+var _lastSavedCaseId=null; /* 直近にGAS保存した際に返却された案件ID（相談申込みとの関連付けに使用） */
+var _autoSaveDone=false; /* 二重登録防止フラグ：診断結果表示時の自動保存が完了したらtrue */
 var D={mar:'既婚',ch:0,par:'両方故人',si:0,deadSib:0,nephews:0,halfSib:0,gpar:'',deadCh:0,grandCh:0,done:[],worry:[],ar:{},
   sibTypes:{ani:0,otouto:0,ane:0,imouto:0},
   halfSibTypes:{hAni:0,hOtouto:0,hAne:0,hImouto:0},
@@ -2162,12 +2152,54 @@ function goTab(n){
   // Allow direct navigation - if going forward, allow; if going back, always allow
   go(n);
 }
+function _wlOfficeName(){
+  try{var d=JSON.parse(sessionStorage.getItem('wl_office_data'))||{};return d.name||'';}catch(e){return '';}
+}
 function go(n){
   if(n===6)buildResult();
   if(n===5){['place','cpr','injection','nutrition','blood','organ','body'].forEach(advRadio);var ot=document.getElementById('adv-other-text');if(ot)ot.value=ADV.other||'';}
   [0,1,2,3,4,5,6].forEach(function(i){document.getElementById('s'+i).style.display=i===n?'':'none';var p2=document.getElementById('p'+i);p2.className='ps'+(i===n?' active':i<n?' done':'');});
   _showFloatBtn(n!==6);
   window.scrollTo({top:0,behavior:"instant"});
+  /* ── 診断結果表示時に自動保存（二重登録防止） ── */
+  if(n===6&&!_autoSaveDone){
+    _autoSaveDone=true;
+    _autoSaveToGAS();
+  }
+}
+/* 診断結果表示時の自動GAS送信（利用者には保存状況を表示しない） */
+function _autoSaveToGAS(){
+  if(!GAS_WEBAPP_URL){console.warn('[AutoSave] GAS_WEBAPP_URL未設定のためスキップ');return;}
+  var enName=document.getElementById('en-name'),enTel=document.getElementById('en-tel');
+  var diagnosisSnapshot={
+    D:D,EN:EN,ADV:ADV,D_CT:CT_STATE,D_PET:D_PET,D_OBIT:D_OBIT,D_FGUEST:D_FGUEST,D_KEIMI:D_KEIMI,
+    enFields:collectENFields()
+  };
+  var payload={
+    formType:'diagnosis',
+    registeredAt:new Date().toLocaleString('ja-JP'),
+    companyName:_wlOfficeName(),
+    staffName:'',
+    customerName:(enName?enName.value.trim():''),
+    customerEmail:'',
+    customerTel:(enTel?enTel.value.trim():''),
+    contactMethod:'',
+    answersJson:JSON.stringify(diagnosisSnapshot),
+    resultText:buildDiagnosisResultText(),
+    totalAssets:getTotalAssets(),
+    totalDebt:getTotalDebt(),
+    estimatedTax:estimateInheritanceTax(),
+    familySummary:buildFamilySummary(),
+    consultRequest:'',
+    pdfExported:_pdfExported?'あり':'なし'
+  };
+  postToGAS(payload,function(data){
+    var caseId=(data&&data.caseId)||'-';
+    _lastSavedCaseId=caseId;
+    console.log('[AutoSave] 保存完了 案件ID：'+caseId);
+  },function(msg){
+    console.warn('[AutoSave] 保存失敗：'+msg);
+  });
 }
 function getHeirShares(){
   var sp=D.mar==='既婚',nk=D.ch;
@@ -3929,8 +3961,8 @@ renderAsecs();ctRender();renderPets();renderObits();renderFunGuests();renderKeim
 checkExistingSave();
 
 /* ============================================================
-   案件保存 ／ 無料相談申込 機能
-   - 診断完了画面の「案件として保存する」「無料相談を申し込む」
+   自動案件保存 ／ 無料相談申込 機能
+   - 診断完了画面表示時に自動でGASへ送信しスプレッドシートへ保存
    - Google Apps Script 経由でGoogleスプレッドシートへ送信する
    ============================================================ */
 
@@ -4109,81 +4141,12 @@ function submitConsult(){
   });
 }
 
-/* ===== 案件として保存モーダル ===== */
-var CASE_SAVE={staff:'',custName:'',custEmail:'',custTel:'',contact:'',memo:''};
-function _wlOfficeName(){
-  try{var d=JSON.parse(sessionStorage.getItem('wl_office_data'))||{};return d.name||'';}catch(e){return '';}
-}
-function openCaseSaveModal(){
-  /* セッション内で前回入力した担当者名を引き継ぐ */
-  try{CASE_SAVE.staff=sessionStorage.getItem('_case_staff_name')||CASE_SAVE.staff;}catch(e){}
-  document.getElementById('case-staff').value=CASE_SAVE.staff||'';
-  /* エンディングノートの氏名・電話番号が入力済みなら初期値として引用（再入力の手間を削減） */
-  var enName=document.getElementById('en-name'),enTel=document.getElementById('en-tel');
-  document.getElementById('case-customer-name').value=CASE_SAVE.custName||(enName?enName.value:'')||'';
-  document.getElementById('case-customer-tel').value=CASE_SAVE.custTel||(enTel?enTel.value:'')||'';
-  document.getElementById('case-customer-email').value=CASE_SAVE.custEmail||'';
-  lcRenderRadio('case-contact-method',['メール','電話','どちらでも可'],function(){return CASE_SAVE.contact;},function(v){CASE_SAVE.contact=v;});
-  document.getElementById('case-memo').value=CASE_SAVE.memo||'';
-  document.getElementById('case-status').textContent='';
-  document.getElementById('case-status').className='lc-status';
-  document.getElementById('case-overlay').classList.add('lc-active');
-}
-function closeCaseModal(){document.getElementById('case-overlay').classList.remove('lc-active');}
-function submitCaseSave(){
-  CASE_SAVE.staff=document.getElementById('case-staff').value.trim();
-  CASE_SAVE.custName=document.getElementById('case-customer-name').value.trim();
-  CASE_SAVE.custEmail=document.getElementById('case-customer-email').value.trim();
-  CASE_SAVE.custTel=document.getElementById('case-customer-tel').value.trim();
-  CASE_SAVE.memo=document.getElementById('case-memo').value.trim();
-  try{sessionStorage.setItem('_case_staff_name',CASE_SAVE.staff);}catch(e){}
-  var btn=document.getElementById('case-submit-btn');
-  var status=document.getElementById('case-status');
-  btn.disabled=true;btn.textContent='保存中…';
-  var diagnosisSnapshot={
-    D:D,EN:EN,ADV:ADV,D_CT:CT_STATE,D_PET:D_PET,D_OBIT:D_OBIT,D_FGUEST:D_FGUEST,D_KEIMI:D_KEIMI,
-    enFields:collectENFields()
-  };
-  var payload={
-    formType:'diagnosis',
-    registeredAt:new Date().toLocaleString('ja-JP'),
-    companyName:_wlOfficeName(),
-    staffName:CASE_SAVE.staff,
-    customerName:CASE_SAVE.custName,
-    customerEmail:CASE_SAVE.custEmail,
-    customerTel:CASE_SAVE.custTel,
-    contactMethod:CASE_SAVE.contact,
-    answersJson:JSON.stringify(diagnosisSnapshot),
-    resultText:buildDiagnosisResultText(),
-    totalAssets:getTotalAssets(),
-    totalDebt:getTotalDebt(),
-    estimatedTax:estimateInheritanceTax(),
-    familySummary:buildFamilySummary(),
-    consultRequest:CASE_SAVE.memo,
-    pdfExported:_pdfExported?'あり':'なし'
-  };
-  postToGAS(payload,function(data){
-    var caseId=(data&&data.caseId)||'-';
-    _lastSavedCaseId=caseId;
-    btn.disabled=false;btn.textContent='保存する';
-    status.className='lc-status ok';
-    status.textContent='✅ 案件として保存しました（案件ID：'+caseId+'）';
-    var topStatus=document.getElementById('case-save-status');
-    if(topStatus){topStatus.className='case-save-status ok';topStatus.textContent='✅ 保存済（案件ID：'+caseId+'）';}
-    setTimeout(closeCaseModal,1800);
-  },function(msg){
-    btn.disabled=false;btn.textContent='保存する';
-    status.className='lc-status err';
-    status.textContent='⚠ '+msg;
-  });
-}
 /* オーバーレイ背景クリック／Escapeキーでモーダルを閉じる（イベントデリゲーションのためDOM読込順に依存しない） */
 document.addEventListener('click',function(e){
   if(e.target&&e.target.id==='consult-overlay')closeConsultModal();
-  if(e.target&&e.target.id==='case-overlay')closeCaseModal();
 });
 document.addEventListener('keydown',function(e){
-  if(e.key==='Escape'){closeConsultModal();closeCaseModal();}
+  if(e.key==='Escape'){closeConsultModal();}
 });
 </script>
 
@@ -4699,45 +4662,6 @@ document.addEventListener('keydown',function(e){
       <button class="lc-submit-btn" id="consult-submit-btn" onclick="submitConsult()">送信する</button>
     </div>
     <div class="lc-status" id="consult-status"></div>
-  </div>
-</div>
-
-<!-- ============================================================
-     案件として保存モーダル
-     ============================================================ -->
-<div id="case-overlay" class="lc-overlay" role="dialog" aria-modal="true" aria-label="案件として保存">
-  <div class="lc-modal">
-    <button class="lc-close" onclick="closeCaseModal()" aria-label="閉じる">✕</button>
-    <h2 class="lc-modal-title">案件として保存</h2>
-    <p class="lc-modal-sub">診断結果を案件として記録します。顧客情報はわかる範囲でご入力ください（すべて任意）。</p>
-    <div class="lc-field">
-      <label>担当者名</label>
-      <input type="text" id="case-staff" placeholder="例：鈴木 一郎">
-    </div>
-    <div class="lc-field">
-      <label>顧客氏名（任意）</label>
-      <input type="text" id="case-customer-name" placeholder="例：山田 太郎">
-    </div>
-    <div class="lc-field">
-      <label>メールアドレス（任意）</label>
-      <input type="email" id="case-customer-email" placeholder="例：example@example.com">
-    </div>
-    <div class="lc-field">
-      <label>電話番号（任意）</label>
-      <input type="tel" id="case-customer-tel" placeholder="例：090-0000-0000">
-    </div>
-    <div class="lc-field">
-      <label>希望連絡方法</label>
-      <div class="rg" id="case-contact-method"></div>
-    </div>
-    <div class="lc-field">
-      <label>相談希望内容・メモ（任意）</label>
-      <textarea id="case-memo" placeholder="顧客の相談希望内容やメモをご入力ください"></textarea>
-    </div>
-    <div class="lc-actions">
-      <button class="lc-submit-btn" id="case-submit-btn" onclick="submitCaseSave()">保存する</button>
-    </div>
-    <div class="lc-status" id="case-status"></div>
   </div>
 </div>
 
