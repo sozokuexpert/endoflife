@@ -4090,57 +4090,6 @@ function lcRenderChecks(elId,opts,getArr){
   });
 }
 
-/* ===== 無料相談申込モーダル ===== */
-var CONSULT_TOPICS=['相続手続き','相続登記','相続税申告','遺産分割協議','遺言作成','家族信託','任意後見','死後事務委任','空き家売却','不動産名義変更','葬儀・納骨相談','終活全般','その他'];
-var CONSULT={name:'',email:'',tel:'',contact:'',topics:[],memo:''};
-function openConsultModal(){
-  lcRenderRadio('consult-contact-method',['メール','電話','どちらでも可'],function(){return CONSULT.contact;},function(v){CONSULT.contact=v;});
-  lcRenderChecks('consult-topics',CONSULT_TOPICS,function(){return CONSULT.topics;});
-  document.getElementById('consult-status').textContent='';
-  document.getElementById('consult-status').className='lc-status';
-  document.getElementById('consult-overlay').classList.add('lc-active');
-}
-function closeConsultModal(){document.getElementById('consult-overlay').classList.remove('lc-active');}
-function submitConsult(){
-  CONSULT.name=document.getElementById('consult-name').value.trim();
-  CONSULT.email=document.getElementById('consult-email').value.trim();
-  CONSULT.tel=document.getElementById('consult-tel').value.trim();
-  CONSULT.memo=document.getElementById('consult-memo').value.trim();
-  var nameErr=document.getElementById('consult-name-err');
-  var emailErr=document.getElementById('consult-email-err');
-  nameErr.textContent='';emailErr.textContent='';
-  var ok=true;
-  if(!CONSULT.name){nameErr.textContent='お名前をご入力ください。';ok=false;}
-  if(!CONSULT.email){emailErr.textContent='メールアドレスをご入力ください。';ok=false;}
-  else if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(CONSULT.email)){emailErr.textContent='メールアドレスの形式をご確認ください。';ok=false;}
-  if(!ok)return;
-  var btn=document.getElementById('consult-submit-btn');
-  var status=document.getElementById('consult-status');
-  btn.disabled=true;btn.textContent='送信中…';
-  var payload={
-    formType:'consultation',
-    appliedAt:new Date().toLocaleString('ja-JP'),
-    name:CONSULT.name,
-    email:CONSULT.email,
-    tel:CONSULT.tel,
-    contactMethod:CONSULT.contact,
-    topics:CONSULT.topics.join('、'),
-    memo:CONSULT.memo,
-    relatedCaseId:_lastSavedCaseId||'',
-    relatedSummary:buildFamilySummary()
-  };
-  btn.disabled=false;
-btn.textContent='送信する';
-window.location.href='https://sozoku-expert.net/contact/';
-}
-
-/* オーバーレイ背景クリック／Escapeキーでモーダルを閉じる（イベントデリゲーションのためDOM読込順に依存しない） */
-document.addEventListener('click',function(e){
-  if(e.target&&e.target.id==='consult-overlay')closeConsultModal();
-});
-document.addEventListener('keydown',function(e){
-  if(e.key==='Escape'){closeConsultModal();}
-});
 </script>
 
 <footer class="site-footer" itemscope itemtype="https://schema.org/LegalService">
