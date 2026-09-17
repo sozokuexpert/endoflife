@@ -2159,8 +2159,8 @@ function go(n){
   [0,1,2,3,4,5,6].forEach(function(i){document.getElementById('s'+i).style.display=i===n?'':'none';var p2=document.getElementById('p'+i);p2.className='ps'+(i===n?' active':i<n?' done':'');});
   _showFloatBtn(n!==6);
   window.scrollTo({top:0,behavior:"instant"});
-  /* ── 診断結果表示時に自動保存（二重登録防止） ── */
- 
+ } 
+  
 function getHeirShares(){
   var sp=D.mar==='既婚',nk=D.ch;
   var parB=D.par==='両方存命',parO=D.par==='一方存命';
