@@ -2167,40 +2167,6 @@ function go(n){
    // _autoSaveToGAS();
   }
 }
-/* 診断結果表示時の自動GAS送信（利用者には保存状況を表示しない） */
-function _autoSaveToGAS(){
-  if(!GAS_WEBAPP_URL){console.warn('[AutoSave] GAS_WEBAPP_URL未設定のためスキップ');return;}
-  var enName=document.getElementById('en-name'),enTel=document.getElementById('en-tel');
-  var diagnosisSnapshot={
-    D:D,EN:EN,ADV:ADV,D_CT:CT_STATE,D_PET:D_PET,D_OBIT:D_OBIT,D_FGUEST:D_FGUEST,D_KEIMI:D_KEIMI,
-    enFields:collectENFields()
-  };
-  var payload={
-    formType:'diagnosis',
-    registeredAt:new Date().toLocaleString('ja-JP'),
-    companyName:_wlOfficeName(),
-    staffName:'',
-    customerName:(enName?enName.value.trim():''),
-    customerEmail:'',
-    customerTel:(enTel?enTel.value.trim():''),
-    contactMethod:'',
-    answersJson:JSON.stringify(diagnosisSnapshot),
-    resultText:buildDiagnosisResultText(),
-    totalAssets:getTotalAssets(),
-    totalDebt:getTotalDebt(),
-    estimatedTax:estimateInheritanceTax(),
-    familySummary:buildFamilySummary(),
-    consultRequest:'',
-    pdfExported:_pdfExported?'あり':'なし'
-  };
-  postToGAS(payload,function(data){
-    var caseId=(data&&data.caseId)||'-';
-    _lastSavedCaseId=caseId;
-    console.log('[AutoSave] 保存完了 案件ID：'+caseId);
-  },function(msg){
-    console.warn('[AutoSave] 保存失敗：'+msg);
-  });
-}
 function getHeirShares(){
   var sp=D.mar==='既婚',nk=D.ch;
   var parB=D.par==='両方存命',parO=D.par==='一方存命';
