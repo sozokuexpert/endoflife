@@ -4566,46 +4566,5 @@ function lcRenderChecks(elId,opts,getArr){
 })();
 </script>
 
-<!-- ============================================================
-     無料相談申込モーダル
-     ============================================================ -->
-<div id="consult-overlay" class="lc-overlay" role="dialog" aria-modal="true" aria-label="無料相談申込">
-  <div class="lc-modal">
-    <button class="lc-close" onclick="closeConsultModal()" aria-label="閉じる">✕</button>
-    <h2 class="lc-modal-title">無料相談を申し込む</h2>
-    <p class="lc-modal-sub">下記にご入力いただくと、専門家より追ってご連絡いたします。</p>
-    <div class="lc-field">
-      <label>お名前<span class="lc-req">必須</span></label>
-      <input type="text" id="consult-name" placeholder="例：山田 太郎">
-      <div class="lc-err" id="consult-name-err"></div>
-    </div>
-    <div class="lc-field">
-      <label>メールアドレス<span class="lc-req">必須</span></label>
-      <input type="email" id="consult-email" placeholder="例：example@example.com">
-      <div class="lc-err" id="consult-email-err"></div>
-    </div>
-    <div class="lc-field">
-      <label>電話番号（任意）</label>
-      <input type="tel" id="consult-tel" placeholder="例：090-0000-0000">
-    </div>
-    <div class="lc-field">
-      <label>希望連絡方法</label>
-      <div class="rg" id="consult-contact-method"></div>
-    </div>
-    <div class="lc-field">
-      <label>相談内容（複数選択可）</label>
-      <div class="lc-check-col" id="consult-topics"></div>
-    </div>
-    <div class="lc-field">
-      <label>自由記入欄（任意）</label>
-      <textarea id="consult-memo" placeholder="ご相談内容の詳細やご質問など、自由にご記入ください"></textarea>
-    </div>
-    <div class="lc-actions">
-      <button class="lc-submit-btn" id="consult-submit-btn" onclick="submitConsult()">送信する</button>
-    </div>
-    <div class="lc-status" id="consult-status"></div>
-  </div>
-</div>
-
 </body>
 </html>
