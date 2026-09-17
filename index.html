@@ -4129,16 +4129,9 @@ function submitConsult(){
     relatedCaseId:_lastSavedCaseId||'',
     relatedSummary:buildFamilySummary()
   };
-  postToGAS(payload,function(data){
-    btn.disabled=false;btn.textContent='送信する';
-    status.className='lc-status ok';
-    status.textContent='✅ お申し込みを受け付けました（受付番号：'+(data&&data.caseId||'-')+'）。担当者よりご連絡いたします。';
-    setTimeout(closeConsultModal,1800);
-  },function(msg){
-    btn.disabled=false;btn.textContent='送信する';
-    status.className='lc-status err';
-    status.textContent='⚠ '+msg;
-  });
+  btn.disabled=false;
+btn.textContent='送信する';
+window.location.href='https://sozoku-expert.net/contact/';
 }
 
 /* オーバーレイ背景クリック／Escapeキーでモーダルを閉じる（イベントデリゲーションのためDOM読込順に依存しない） */
