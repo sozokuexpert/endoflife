@@ -1912,30 +1912,6 @@ function lookupZip(){
     });
 }
 
-
-
-/* ===== 一時保存 ===== */
-var SAVE_KEY='dai8_clinic_save';
-var EN_FIELDS=["en-name","en-birth","en-gender","en-blood","en-tel","en-date","en-zip","en-addr","en-ec1n","en-ec1r","en-ec1t","en-ec2n","en-ec2r","en-ec2t","en-fun-note","en-temple","en-temple-addr","en-temple-tel","en-grave-mgr-name","en-grave-mgr-tel","en-grave-mgr-rel","en-ossuary-co","en-ossuary-addr","en-ossuary-tel","en-nature-co","en-nature-addr","en-nature-tel","en-sea-area","en-grave-other","en-funeral-co","en-funeral-branch","en-funeral-tel","en-funeral-cost","en-mutual-detail","en-coffin-items","en-portrait-loc","en-portrait-photo","en-will","en-bank-loc","en-ins-loc","en-pension","en-touki-loc","en-hoken-loc","en-docs","en-digi-sp-model","en-digi-sp-lock","en-digi-pc-model","en-digi-netbank","en-digi-email","en-digi-sns","en-digi-note","en-doc","en-doc-tel","en-law","en-law-tel","en-tax","en-tax-tel","en-msg"];
-
-function collectENFields(){
-  var obj={};
-  EN_FIELDS.forEach(function(id){
-    var el=document.getElementById(id);
-    if(el)obj[id]=el.value;
-  });
-  return obj;
-}
-
-function restoreENFields(obj){
-  if(!obj)return;
-  EN_FIELDS.forEach(function(id){
-    var el=document.getElementById(id);
-    if(el&&obj[id]!==undefined)el.value=obj[id];
-  });
-  if(typeof window._syncBirthSelects==='function')window._syncBirthSelects();
-}
-
 /* 現在表示中のセクション番号を返す */
 function _getCurrentSection(){
   for(var i=0;i<=6;i++){
