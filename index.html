@@ -1985,24 +1985,6 @@ function floatSave(){
   }
 }
 
-function checkExistingSave(){
-  try{
-    var raw=sessionStorage.getItem(SAVE_KEY);
-    if(raw){
-      var payload=JSON.parse(raw);
-      var lb=document.getElementById('load-btn');
-      if(lb){lb.style.display='';}
-      var st=document.getElementById('save-time');
-      if(st)st.textContent=' — 保存あり（'+payload.savedAt+'）';
-      /* イントロ画面に「続きから再開」ボタンを表示 */
-      var rw=document.getElementById('resume-wrap');
-      if(rw)rw.style.display='';
-      var rs=document.getElementById('resume-saved-at');
-      if(rs)rs.textContent='（'+payload.savedAt+'）';
-    }
-  }catch(e){}
-}
-
 /* イントロ画面「続きから再開」ボタン専用：確認ダイアログなしで直接復元 */
 function resumeFromSave(){
   try{
