@@ -1943,7 +1943,7 @@ function doSave(btn){
     savedSection:_getCurrentSection()
   };
   try{
-    sessionStorage.setItem(SAVE_KEY,JSON.stringify(payload));
+    //sessionStorage.setItem(SAVE_KEY,JSON.stringify(payload));
     btn.textContent='✓ 保存しました';
     btn.classList.add('saved');
     document.getElementById('save-time').textContent=' — '+payload.savedAt;
@@ -1993,7 +1993,7 @@ function floatSave(){
     savedSection:_getCurrentSection()
   };
   try{
-    sessionStorage.setItem(SAVE_KEY,JSON.stringify(payload));
+    //sessionStorage.setItem(SAVE_KEY,JSON.stringify(payload));
     var st=document.getElementById('save-time');
     if(st)st.textContent=' — '+payload.savedAt;
     _showSaveToast();
