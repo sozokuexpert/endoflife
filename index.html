@@ -510,20 +510,7 @@ body{font-family:"Hiragino Kaku Gothic Pro","Meiryo","Yu Gothic",system-ui,sans-
     </div>
   </div>
 
-  <!-- 前回データがある場合のみ表示 -->
-  <div id="resume-wrap" style="display:none">
-    <div class="intro-resume-note">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg>
-      前回の入力データが保存されています
-    </div>
-    <button class="intro-resume-btn" onclick="resumeFromSave()">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.95"/></svg>
-      前回の続きから再開する
-      <span class="intro-resume-btn-sub" id="resume-saved-at"></span>
-    </button>
-  </div>
-
-  <button class="intro-start-btn" onclick="startDiagnosis()">
+    <button class="intro-start-btn" onclick="startDiagnosis()">
     <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12l2 2 4-4"/></svg>
     診断を開始する
   </button>
