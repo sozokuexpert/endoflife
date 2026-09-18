@@ -1912,27 +1912,10 @@ function lookupZip(){
     });
 }
 
-/* 現在表示中のセクション番号を返す */
-function _getCurrentSection(){
-  for(var i=0;i<=6;i++){
-    var s=document.getElementById('s'+i);
-    if(s&&s.style.display==='')return i;
-  }
-  return 0;
-}
-
 /* フローティングボタンの表示/非表示 */
 function _showFloatBtn(show){
   var b=document.getElementById('float-save-btn');
   if(b)b.style.display=show?'flex':'none';
-}
-
-/* 保存完了トーストを3.5秒表示 */
-function _showSaveToast(){
-  var t=document.getElementById('save-toast');
-  if(!t)return;
-  t.style.display='block';
-  setTimeout(function(){t.style.display='none';},3500);
 }
 
 function startDiagnosis(){
