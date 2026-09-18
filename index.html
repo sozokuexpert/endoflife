@@ -1936,32 +1936,6 @@ function restoreENFields(obj){
   if(typeof window._syncBirthSelects==='function')window._syncBirthSelects();
 }
 
-function doSave(btn){
-  var payload={
-    D:JSON.parse(JSON.stringify(D)),
-    EN:JSON.parse(JSON.stringify(EN)),
-    ADV:JSON.parse(JSON.stringify(ADV)),
-    D_CT:JSON.parse(JSON.stringify(CT_STATE)),
-    D_PET:JSON.parse(JSON.stringify(D_PET)),
-    D_OBIT:JSON.parse(JSON.stringify(D_OBIT)),
-    D_FGUEST:JSON.parse(JSON.stringify(D_FGUEST)),
-    D_KEIMI:JSON.parse(JSON.stringify(D_KEIMI)),
-    FGUEST_NONE:FGUEST_NONE,
-    enFields:collectENFields(),
-    savedAt:new Date().toLocaleString('ja-JP'),
-    savedSection:_getCurrentSection()
-  };
-  try{
-    //sessionStorage.setItem(SAVE_KEY,JSON.stringify(payload));
-    btn.textContent='✓ 保存しました';
-    btn.classList.add('saved');
-    document.getElementById('save-time').textContent=' — '+payload.savedAt;
-    setTimeout(function(){btn.textContent='一時保存';btn.classList.remove('saved');},2000);
-  }catch(e){
-    alert('保存に失敗しました。ブラウザのストレージが無効になっている可能性があります。');
-  }
-}
-
 /* 現在表示中のセクション番号を返す */
 function _getCurrentSection(){
   for(var i=0;i<=6;i++){
