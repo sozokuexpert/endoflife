@@ -1985,16 +1985,6 @@ function floatSave(){
   }
 }
 
-function clearSave(){
-  if(!sessionStorage.getItem(SAVE_KEY)){alert('保存データがありません。');return;}
-  if(!confirm('保存データを消去しますか？\n（共有PCをご利用の場合は必ず消去してください）'))return;
-  /* SAVE_KEY のみ削除（他サイトのデータを巻き込まないよう sessionStorage.clear() は使用しない） */
-  sessionStorage.removeItem(SAVE_KEY);
-  document.getElementById('save-time').textContent='';
-  document.getElementById('load-btn').style.display='none';
-  alert('保存データを消去しました。');
-}
-
 function checkExistingSave(){
   try{
     var raw=sessionStorage.getItem(SAVE_KEY);
