@@ -1985,58 +1985,6 @@ function floatSave(){
   }
 }
 
-/* イントロ画面「続きから再開」ボタン専用：確認ダイアログなしで直接復元 */
-function resumeFromSave(){
-  try{
-    var raw=sessionStorage.getItem(SAVE_KEY);
-    if(!raw){alert('保存データが見つかりません。');return;}
-    var payload=JSON.parse(raw);
-    D=payload.D;
-    EN=payload.EN||{};
-    if(payload.D_CT&&typeof Object.values(payload.D_CT)[0]==='object'&&'active' in Object.values(payload.D_CT)[0]){CT_STATE=payload.D_CT;}else{CT_DEFS.forEach(function(d){CT_STATE[d.id]=d.type==='doc'?{active:false,loc:''}:{active:false,entries:[ctDefaultEntry(d.id)]};});}
-    D_PET=payload.D_PET||[];
-    D_OBIT=payload.D_OBIT||[];
-    D_FGUEST=payload.D_FGUEST||[];
-    D_KEIMI=payload.D_KEIMI||[];
-    FGUEST_NONE=payload.FGUEST_NONE||false;
-    if(payload.ADV){ADV=payload.ADV;}
-    if(payload.D){
-      D.deadCh=payload.D.deadCh||0;D.grandCh=payload.D.grandCh||0;
-      if(payload.D.sibTypes)D.sibTypes=payload.D.sibTypes;
-      if(payload.D.halfSibTypes)D.halfSibTypes=payload.D.halfSibTypes;
-      if(payload.D.deadSibDetails)D.deadSibDetails=payload.D.deadSibDetails;
-      _syncLegacySibFields();
-    }
-    rRadio('r-mar',['未婚','既婚','離婚','死別'],'mar',renderProxy);
-    rRadio('r-par',['両方存命','一方存命','両方故人'],'par',renderProxy);
-    document.getElementById('ch-v').textContent=D.ch;
-    renderSibTypeCounters();
-    renderProxy();
-    renderAsecs();
-    rChecksDone();rChecks('worry-list','worry',WORRY_OPTS);
-    rRadioEN('r-fun',['一般葬','家族葬','直葬（火葬のみ）','お任せ'],'fun');
-    rRadioEN('r-grave',['先祖の墓','新規購入','納骨堂','樹木葬','散骨','収骨しない','その他'],'grave',renderGraveDetail);
-    rRadioEN('r-ossuary-contract',['契約済み','契約予定あり','まだない'],'ossuaryContract');
-    rRadioEN('r-nature-contract',['契約済み','契約予定あり','まだない'],'natureContract');
-    rRadioEN('r-estimate',['あり','なし','検討中'],'estimate');
-    rRadioEN('r-mutual',['加入あり','加入なし','検討中'],'mutual');
-    updateMutualDetail();
-    rRadioEN('r-portrait',['準備済み','未準備','遺影の必要なし'],'portrait',updatePortraitDetail);
-    updatePortraitDetail();
-    ctRender();renderPets();renderObits();renderFunGuests();renderKeimi();renderGpar();
-    setTimeout(function(){restoreENFields(payload.enFields);},100);
-    document.getElementById('save-time').textContent=' — 復元済（'+payload.savedAt+'）';
-    document.getElementById('intro-screen').style.display='none';
-    document.getElementById('main-screen').style.display='';
-    /* 保存時のセクションへ遷移（結果画面＝6の場合はs0へ戻す） */
-    var tgt=(typeof payload.savedSection==='number'&&payload.savedSection>=0&&payload.savedSection<6)?payload.savedSection:0;
-    go(tgt);
-  }catch(e){
-    alert('復元中にエラーが発生しました。');
-  }
-}
-
-
 function startDiagnosis(){
   document.getElementById('intro-screen').style.display='none';
   document.getElementById('main-screen').style.display='';
