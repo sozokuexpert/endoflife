@@ -3920,38 +3920,6 @@ renderAsecs();ctRender();renderPets();renderObits();renderFunGuests();renderKeim
 })();
 checkExistingSave();
 
-/* ============================================================
-   自動案件保存 ／ 無料相談申込 機能
-   - 診断完了画面表示時に自動でGASへ送信しスプレッドシートへ保存
-   - Google Apps Script 経由でGoogleスプレッドシートへ送信する
-   ============================================================ */
-
-/* ★設定箇所：Google Apps ScriptのウェブアプリURLをここに設定してください
-   （GASエディタで「デプロイ」→「ウェブアプリ」として発行されるURL）  */
-/* ★ 管理者設定箇所：GASウェブアプリのURLをここに直接記載してください */
-var GAS_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbyyj_rqnxNiPI90JY2U1YhO8AoKhQItbOE2xZNhPfJwBDGZQWY9KMQKdOPy9vlIsRn6/exec';
-
-/* Google Apps Scriptへ送信する共通関数
-   GAS側のCORS制約を避けるため text/plain でJSON文字列を送信する */
-function postToGAS(payload,onSuccess,onError){
-   if(!GAS_WEBAPP_URL){
-      onError('システム設定が完了していません。管理者へお問い合わせください。');
-      return;
-  }
-  fetch(GAS_WEBAPP_URL,{
-    method:'POST',
-    mode:'cors',
-    headers:{'Content-Type':'text/plain;charset=utf-8'},
-    body:JSON.stringify(payload)
-  }).then(function(res){return res.json();})
-    .then(function(data){
-      if(data&&data.result==='success'){onSuccess(data);}
-      else{onError((data&&data.message)||'保存に失敗しました。');}
-    }).catch(function(err){
-      onError('通信エラーが発生しました。ネットワーク接続をご確認ください。');
-    });
-}
-
 /* ── 推定相続税の簡易計算 ──
    課税遺産総額（資産+生命保険の課税対象分−負債−基礎控除）を法定相続分で分配し、
    各取得金額に相続税の速算表を適用して総額を算出する（簡易シミュレーションです） */
