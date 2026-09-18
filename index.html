@@ -3699,20 +3699,7 @@ renderAsecs();ctRender();renderPets();renderObits();renderFunGuests();renderKeim
   selM.addEventListener('change',function(){updateDays();syncHidden();updateAge();});
   selD.addEventListener('change',function(){syncHidden();updateAge();});
 
-  /* sessionStorage 復元後にセレクトへ反映（restoreENFields から呼ばれる） */
-  window._syncBirthSelects=function(){
-    var val=hidden.value;
-    if(!val)return;
-    /* 「YYYY年M月D日」と「YYYY-MM-DD」の両形式に対応 */
-    var r=val.match(/^(\d{4})年(\d{1,2})月(\d{1,2})日$/)||val.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
-    if(!r)return;
-    selY.value=parseInt(r[1]);
-    selM.value=parseInt(r[2]);
-    updateDays();
-    selD.value=parseInt(r[3]);
-    updateAge();
-  };
-})();
+  })();
 
 /* ── 推定相続税の簡易計算 ──
    課税遺産総額（資産+生命保険の課税対象分−負債−基礎控除）を法定相続分で分配し、
