@@ -1959,32 +1959,6 @@ function _showSaveToast(){
   setTimeout(function(){t.style.display='none';},3500);
 }
 
-/* フローティングボタン専用の保存処理 */
-function floatSave(){
-  var payload={
-    D:JSON.parse(JSON.stringify(D)),
-    EN:JSON.parse(JSON.stringify(EN)),
-    ADV:JSON.parse(JSON.stringify(ADV)),
-    D_CT:JSON.parse(JSON.stringify(CT_STATE)),
-    D_PET:JSON.parse(JSON.stringify(D_PET)),
-    D_OBIT:JSON.parse(JSON.stringify(D_OBIT)),
-    D_FGUEST:JSON.parse(JSON.stringify(D_FGUEST)),
-    D_KEIMI:JSON.parse(JSON.stringify(D_KEIMI)),
-    FGUEST_NONE:FGUEST_NONE,
-    enFields:collectENFields(),
-    savedAt:new Date().toLocaleString('ja-JP'),
-    savedSection:_getCurrentSection()
-  };
-  try{
-    //sessionStorage.setItem(SAVE_KEY,JSON.stringify(payload));
-    var st=document.getElementById('save-time');
-    if(st)st.textContent=' — '+payload.savedAt;
-    _showSaveToast();
-  }catch(e){
-    alert('保存に失敗しました。');
-  }
-}
-
 function startDiagnosis(){
   document.getElementById('intro-screen').style.display='none';
   document.getElementById('main-screen').style.display='';
