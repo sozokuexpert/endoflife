@@ -1896,7 +1896,7 @@ function _showFloatBtn(show){
 function startDiagnosis(){
   document.getElementById('intro-screen').style.display='none';
   document.getElementById('main-screen').style.display='';
-  _showFloatBtn(true);
+  
   window.scrollTo({top:0,behavior:"instant"});
 }
 function goTab(n){
@@ -1910,7 +1910,7 @@ function go(n){
   if(n===6)buildResult();
   if(n===5){['place','cpr','injection','nutrition','blood','organ','body'].forEach(advRadio);var ot=document.getElementById('adv-other-text');if(ot)ot.value=ADV.other||'';}
   [0,1,2,3,4,5,6].forEach(function(i){document.getElementById('s'+i).style.display=i===n?'':'none';var p2=document.getElementById('p'+i);p2.className='ps'+(i===n?' active':i<n?' done':'');});
-  _showFloatBtn(n!==6);
+  
   window.scrollTo({top:0,behavior:"instant"});
  } 
   
