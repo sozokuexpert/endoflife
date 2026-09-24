@@ -3713,22 +3713,10 @@ function lcRenderChecks(elId,opts,getArr){
 
 <script>
 (function(){
-  var STORAGE_KEY='wl_office_data';
   var container=document.getElementById('qrcode-img');
   if(!container)return;
 
-  function buildShareUrl(){
-    var d={};
-    try{d=JSON.parse(sessionStorage.getItem(STORAGE_KEY))||{};}catch(e){}
-    var base=window.location.origin+window.location.pathname;
-    var parts=[];
-    if(d.name)   parts.push('n=' +encodeURIComponent(d.name));
-    if(d.tel)    parts.push('t=' +encodeURIComponent(d.tel));
-    if(d.hp)     parts.push('h=' +encodeURIComponent(d.hp));
-    if(d.contact)parts.push('ct='+encodeURIComponent(d.contact));
-    return base+(parts.length?'?'+parts.join('&'):'');
-  }
-
+  
   var img=document.createElement('img');
   img.src='https://api.qrserver.com/v1/create-qr-code/?size=160x160&color=0F6E56&data='+encodeURIComponent('https://sozokuexpert.github.io/endoflife/');
   img.alt='QRコード';
